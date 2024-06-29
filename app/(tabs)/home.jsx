@@ -1,0 +1,69 @@
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, Image, RefreshControl, Text, View } from "react-native";
+
+import { images } from "../../constants";
+import useAppwrite from "../../lib/useAppwrite";
+import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
+
+const Home = () => {
+  const { data: posts, refetch } = useAppwrite(getAllPosts);
+  const { data: latestPosts } = useAppwrite(getLatestPosts);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  return (
+    <SafeAreaView className="bg-zinc-950">
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.$id}
+        renderItem={({ item }) => (
+          <VideoCard
+            title={item.title}
+            thumbnail={item.thumbnail}
+            video={item.video}
+            creator={item.creator.username}
+            avatar={item.creator.avatar}
+          />
+        )}
+        ListHeaderComponent={() => (
+          <View className="flex my-6 px-4 space-y-6">
+            <View className="flex justify-center items-center flex-row mb-6">
+                <Text className="text-2xl lowercase text-white">
+                 Poké<Text className="text-sky-400">dex</Text>
+                </Text>
+            </View>
+
+            <SearchInput />
+
+            <View className="w-full flex-1 pt-5 pb-8">
+              <Text className="text-lg font-pregular text-gray-100 mb-3">
+                Recent On <Text className="text-sky-400">Dex</Text>
+              </Text>
+
+              <Trending posts={latestPosts ?? []} />
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={() => (
+          <EmptyState
+            title="Nothing Uploaded Here!"
+            subtitle="No One Created Nothing"
+          />
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+    </SafeAreaView>
+  );
+};
+
+export default Home;
