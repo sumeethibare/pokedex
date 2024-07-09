@@ -31,7 +31,7 @@ const Welcome = () => {
 
           <View className="relative mt-5">
             <Text className="text-3xl text-white font-bold text-center">
-              <Text className="text-sky-400">Pokédex</Text>
+              <Text className="text-sky-500">Pokédex</Text>
             </Text>
 
             <Image
